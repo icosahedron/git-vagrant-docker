@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  nginx:
+    image: nginx
+    hostname: home
+    domainname: icosahedron.io
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /opt/docker/nginx/etc/nginx:/etc/nginx
+      - /opt/docker/nginx/usr/share/nginx:/usr/share/nginx
+      - /etc/letsencrypt:/etc/letsencrypt
+    networks:
+      - dockervmnet
+    depends_on:
+      - gogs
+  gogs:
+    image: gogs/gogs
+    hostname: code
+    domainname: icosahedron.io
+    container_name: gogs
+    networks:
+      - dockervmnet
+    volumes:
+      - /opt/gogs/data:/data
+# this comes in handy in debugging
+#   curl:
+#     image: appropriate/curl
+#     hostname: curl
+#     domainname: icosahedron.io
+#     container_name: curl
+#     networks:
+#       - dockervmnet
+#     depends_on:
+#       - nginx
+#     entrypoint: tail -f /dev/null
+
+volumes:
+  gogs-data:
+    external: true
+
+networks:
+  dockervmnet:
+    driver: "bridge"
+
