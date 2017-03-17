@@ -1,4 +1,4 @@
-version: '3'
+version: '2.1'
 
 services:
   nginx:
@@ -10,8 +10,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /opt/docker/nginx/etc/nginx:/etc/nginx
-      - /opt/docker/nginx/usr/share/nginx:/usr/share/nginx
+      - /opt/docker/etc/nginx/etc/nginx:/etc/nginx
+      - /opt/docker/etc/nginx/usr/share/nginx:/usr/share/nginx
       - /etc/letsencrypt:/etc/letsencrypt
     networks:
       - dockervmnet
@@ -26,6 +26,7 @@ services:
       - dockervmnet
     volumes:
       - /opt/gogs/data:/data
+
 # this comes in handy in debugging
 #   curl:
 #     image: appropriate/curl
@@ -38,9 +39,9 @@ services:
 #       - nginx
 #     entrypoint: tail -f /dev/null
 
-volumes:
-  gogs-data:
-    external: true
+#volumes:
+#  gogs-data:
+#    external: true#
 
 networks:
   dockervmnet:
