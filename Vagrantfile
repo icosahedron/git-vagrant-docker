@@ -105,11 +105,12 @@ Vagrant.configure("2") do |config|
         end
       end
 
-      # install Docker Compose
+      # bring up nginx and Gogs using Docker Compose
       config.trigger.after :up do
         run_remote "mkdir -p /opt/bin"
         run_remote "curl -L `curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r '.assets[].browser_download_url | select(contains(\"Linux\") and contains(\"x86_64\"))'` > /opt/bin/docker-compose 2> /var/log/vagrant.trigger.log"
         run_remote "chmod +x /opt/bin/docker-compose"
+        run_remote "cd /opt/docker/etc && docker-compose up -d"
       end
 
       if $expose_docker_tcp
@@ -135,18 +136,17 @@ Vagrant.configure("2") do |config|
         vb.customize ["modifyvm", :id, "--cpuexecutioncap", "#{$vb_cpuexecutioncap}"]
       end
 
+      # Vagrant will create a network with the host as 172.17.8.1, which is then used to import the NFS hosts.
       ip = "172.17.8.#{i+100}"
       config.vm.network :private_network, ip: ip
 
-      # Uncomment below to enable NFS for sharing the host machine into the coreos-vagrant VM.
-      #config.vm.synced_folder ".", "/home/core/share", id: "core", :nfs => true, :mount_options => ['nolock,vers=3,udp']
-      $shared_folders.each_with_index do |(host_folder, guest_folder), index|
-        # config.vm.synced_folder host_folder.to_s, guest_folder.to_s, id: "core-share%02d" % index, nfs: true, mount_options: ['nolock,vers=3,udp']
-        config.vm.synced_folder host_folder.to_s, guest_folder.to_s, id: "core-share%02d" % index, type: "rsync", rsync__args: ['-a']
+      # Uncomment below to enable sharing the host machine into the coreos-vagrant VM.
+      # The default coreos Vagrantfile uses udp, which hangs on my computer, so I removed it.
+      $nfs_shared_folders.each_with_index do |(host_folder, guest_folder), index|
+        config.vm.synced_folder host_folder.to_s, guest_folder.to_s, id: "core-nfs-share%02d" % index, nfs: true, mount_options: ['nolock,vers=3'], nfs_udp: false
       end
-
-      if $share_home
-        config.vm.synced_folder ENV['HOME'], ENV['HOME'], id: "home", :nfs => true, :mount_options => ['nolock,vers=3,udp']
+      $rsync_shared_folders.each_with_index do |(host_folder, guest_folder), index|
+        config.vm.synced_folder host_folder.to_s, guest_folder.to_s, id: "core-rsync-share%02d" % index, type: "rsync", rsync__args: ['-a']
       end
 
       if File.exist?(CLOUD_CONFIG_PATH)

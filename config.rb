@@ -68,24 +68,17 @@ $update_channel='stable'
 #   export DOCKER_HOST='tcp://127.0.0.1:2375'
 #$expose_docker_tcp=2375
 
-# Enable NFS sharing of your home directory ($HOME) to CoreOS
-# It will be mounted at the same path in the VM as on the host.
-# Example: /Users/foobar -> /Users/foobar
-#$share_home=false
-
 # Customize VMs
 #$vm_gui = false
-$vm_memory = 1024
+$vm_memory = 2048
 $vm_cpus = 1
 #$vb_cpuexecutioncap = 100
 
 # Share additional folders to the CoreOS VMs
-# For example,
-# $shared_folders = {'/path/on/host' => '/path/on/guest', '/home/foo/app' => '/app'}
-# or, to map host folders to guest folders of the same name,
-# $shared_folders = Hash[*['/home/foo/app1', '/home/foo/app2'].map{|d| [d, d]}.flatten]
-#$shared_folders = {}
-$shared_folders = { '/etc/letsencrypt' => '/etc/letsencrypt', './docker' => '/opt/docker/etc', './gogs/data' => '/opt/gogs/data' }
+# $rsync_shared_folders shares folders via rsync, which is only from host to guest
+# $nfs_shared_folders shares folders via NFS, which is bidirectional and much faster than VirtualBox shared folders
+$rsync_shared_folders = { '/etc/letsencrypt' => '/etc/letsencrypt', './docker' => '/opt/docker/etc' }
+$nfs_shared_folders = { './gogs' => '/opt/gogs' } 
 
 # Enable port forwarding from guest(s) to host machine, syntax is: { 80 => 8080 }, auto correction is enabled by default.
 $forwarded_ports = { 80 => 80, 443 => 443 }
