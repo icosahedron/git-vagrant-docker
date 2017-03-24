@@ -141,7 +141,7 @@ Vagrant.configure("2") do |config|
       config.vm.network :private_network, ip: ip
 
       # Uncomment below to enable sharing the host machine into the coreos-vagrant VM.
-      # The default coreos Vagrantfile uses udp, which hangs on my computer, so I removed it.
+      # The default coreos Vagrantfile uses udp, which hangs on my computer, so I disabled it via nfs_udp.
       $nfs_shared_folders.each_with_index do |(host_folder, guest_folder), index|
         config.vm.synced_folder host_folder.to_s, guest_folder.to_s, id: "core-nfs-share%02d" % index, nfs: true, mount_options: ['nolock,vers=3'], nfs_udp: false
       end

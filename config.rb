@@ -41,9 +41,7 @@ end
 # after the equals sign..
 
 # Change basename of the VM
-# The default value is "core", which results in VMs named starting with
-# "core-01" through to "core-${num_instances}".
-$instance_name_prefix="icosahedron"
+$instance_name_prefix="git-server"
 
 # Change the version of CoreOS to be installed
 # To deploy a specific version, simply set $image_version accordingly.
@@ -77,8 +75,8 @@ $vm_cpus = 1
 # Share additional folders to the CoreOS VMs
 # $rsync_shared_folders shares folders via rsync, which is only from host to guest
 # $nfs_shared_folders shares folders via NFS, which is bidirectional and much faster than VirtualBox shared folders
-$rsync_shared_folders = { '/etc/letsencrypt' => '/etc/letsencrypt', './docker' => '/opt/docker/etc' }
-$nfs_shared_folders = { './gogs' => '/opt/gogs' } 
+$rsync_shared_folders = { './docker' => '/opt/docker/etc' }
+$nfs_shared_folders = { './gogs' => '/opt/gogs', '/etc/letsencrypt' => '/etc/letsencrypt' } 
 
 # Enable port forwarding from guest(s) to host machine, syntax is: { 80 => 8080 }, auto correction is enabled by default.
 $forwarded_ports = { 80 => 80, 443 => 443 }
