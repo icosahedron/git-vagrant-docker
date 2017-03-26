@@ -10,11 +10,7 @@ There are a few requirements that must be installed prior to running the Git ser
 
 ## NFS Setup ##
 
-To make backups and configuration easier, Vagrant shares the git repos and SSL certs with the host via NFS[^nfs-shares].  Vagrant takes care of the exports, as long as NFS is installed.  If you're running macOS[^nfs-instructions-mac] or Linux, it should already be installed, or can easily be with a trip to your package manager.
-
-[^nfs-instructions-mac]: I used these [instructions](http://ilgthegeek.old.livius.net/2015/04/18/os-x-start-nfs-daemon/) to enable NFS on macOS
-
-[^nfs-shares]: We use NFS shares rather than the VirtualBox shared folders due to [performance concerns](https://www.jeffgeerling.com/blogs/jeff-geerling/nfs-rsync-and-shared-folder).
+To make backups and configuration easier, Vagrant shares the git repos and SSL certs with the host via NFS<sup id="nfs-shared-ref">[1](#nfs-shared)</sup>.  Vagrant takes care of the exports, as long as NFS is installed.  If you're running macOS<sup id="nfs-instructions-mac-ref">[2](#nfs-instructions-mac)</sup> or Linux, it should already be installed, or can easily be with a trip to your package manager.
 
 If you're on macOS, I recommend checking your NFS configuration by downloading [NFS Manager](https://www.bresink.com/osx/143439/download.php).  It makes it much easier than trying to deal with configuration files.
 
@@ -57,13 +53,9 @@ $ sudo vagrant up
 
 ## Why Use Vagrant Instead of Docker on the Host? ##
 
-I couldn't get Docker containers on macOS to mount any directory on the file system except the user's folder.[^docker-mount].
+I couldn't get Docker containers on macOS to mount any directory on the file system except the user's folder.<sup id="#docker-mount-ref">[3](#docker-mount)</sup>
 
-[^docker-mount]: It's weird, because it *seems* like it should be able to do so. There are preferences for which directories can be mounted, but I never could get them to work.
-
-Since `/etc/letsencrypt` can't be mounted in a Docker container, the certificates had to be copied either into the container or into a data volume that was mounted in the container, or into my home directory (which putting cert private keys in my home directory seems a bit sketchy).  When certs expired, as they do every 90 days with [Let's Encrypt](https://certbot.eff.org/docs/using.html#getting-certificates-and-choosing-plugins), the process had to be repeated.  Hardly difficult, but a chore to remember.[^cron]
-
-[^cron]: I could have used cron jobs to handle all of the filesystem syncs, but I wanted something more "integrated".
+Since `/etc/letsencrypt` can't be mounted in a Docker container, the certificates had to be copied either into the container or into a data volume that was mounted in the container, or into my home directory (which putting cert private keys in my home directory seems a bit sketchy).  When certs expired, as they do every 90 days with [Let's Encrypt](https://certbot.eff.org/docs/using.html#getting-certificates-and-choosing-plugins), the process had to be repeated.  Hardly difficult, but a chore to remember.<sup id="cron-ref">[4](#cron)</sup>
 
 Git repos mounted in my home directory aren't much of a security concern, but the Docker `osxfs` file system is a performance concern, so it was easier to put them in a Vagrant VM that was mounted to the host by NFS.
 
@@ -77,3 +69,11 @@ These issues present, I decided to use a more "native" approach, which is to run
 * Replace nginx with HAProxy as the reverse proxy
 * Try [Gitea](http://gitea.io) instead of Gogs since it sees more active development
 * Running vagrant without using sudo
+
+<a id="nfs-shared" href="#nfs-shared-ref">1</a>: We use NFS shares rather than the VirtualBox shared folders due to [performance concerns](https://www.jeffgeerling.com/blogs/jeff-geerling/nfs-rsync-and-shared-folder).
+
+<a id="nfs-instructions-mac" href="#nfs-instructions-mac-ref">2</a>: I used these [instructions](http://ilgthegeek.old.livius.net/2015/04/18/os-x-start-nfs-daemon/) to enable NFS on macOS
+
+<a id="docker-mount" href="#docker-mount-ref">3</a>: It's weird, because it *seems* like it should be able to do so. There are preferences for which directories can be mounted, but I never could get them to work.
+
+<a id="cron" href="#cron-ref">4</a>: I could have used cron jobs to handle all of the filesystem syncs, but I wanted something more "integrated".
