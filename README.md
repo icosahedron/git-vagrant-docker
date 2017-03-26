@@ -45,6 +45,11 @@ The `Vagrantfile` itself has one notable configuration option.  Where the the NF
 
 The `docker-compose.yml` in docker subdirectory shouldn't need any changes, though the host and domain names should be changed to your own site.
 
+Last, you'll need to configure the nginx site files in `docker/nginx/etc/nginx/conf.d`.  Currently they are set up for the sites code.icosahedron.io and home.icosahedron.io sites.  At a minimum you will need to:
+
+* rename the files to the names of your own sites
+* change the `server_name` option to match your own site.
+
 Once complete, you can simply bring up the Vagrant VM with
 
 ```
